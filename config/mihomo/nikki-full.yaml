@@ -8,7 +8,7 @@ proxy-providers:
   Sakuraca:
     url: ""
     type: http
-    interval: 86400
+    interval: 345600
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -20,7 +20,7 @@ proxy-providers:
   SaySS:
     url: ""
     type: http
-    interval: 86400
+    interval: 345600
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -32,7 +32,7 @@ proxy-providers:
   CockCloud:
     url: ""
     type: http
-    interval: 86400
+    interval: 345600
     health-check:
       enable: true
       url: https://www.gstatic.com/generate_204
@@ -223,7 +223,7 @@ proxy-groups:
   - {name: 🎥 NETFLIX, <<: *default}
   - {name: 💶 PayPal, <<: *default}
   - {name: 🎮 GAME-CN, <<: *default}
-  - { name: 国外QUIC, type: select, proxies: [🚀 默认代理,拒绝], icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/echs-top/proxy/main/icon/Settings.webp' }
+  - {name: ⭕ 国外QUIC, type: select, proxies: [🚀 默认代理,拒绝]} # icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
   - {name: 🐟 漏网之鱼, <<: *default}
   
 
@@ -395,7 +395,7 @@ proxy-groups:
 
 # 规则匹配
 rules:
-  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
+  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),⭕ 国外QUIC
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain)),直连
   - OR,((RULE-SET,tailscale),(RULE-SET,ntp_cn)),直连
 #  - DOMAIN-SUFFIX,qichiyu.com,🚀 默认代理
@@ -420,9 +420,9 @@ rules:
 # 规则集
 ## type：可选http/file/inline  behavior：可选domain/ipcidr/classical format：可选yaml/text/mrs
 rule-anchor:
-  ip: &ip {type: http, interval: 86400, behavior: ipcidr, format: mrs}
-  domain: &domain {type: http, interval: 86400, behavior: domain, format: mrs}
-  class: &class {type: http, interval: 86400, behavior: classical, format: text}
+  ip: &ip {type: http, interval: 345600, behavior: ipcidr, format: mrs}
+  domain: &domain {type: http, interval: 345600, behavior: domain, format: mrs}
+  class: &class {type: http, interval: 345600, behavior: classical, format: text}
 rule-providers: 
   tailscale: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tailscale.mrs"}
   ntp_cn: {<<: *domain,url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ntp@cn.mrs"}
@@ -446,7 +446,6 @@ rule-providers:
   tiktok_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs"}
   geolocation-!cn: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs"}
   cn_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs"}
-  
   private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs"}
   cn_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs"}
   google_ip: { <<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs"}
