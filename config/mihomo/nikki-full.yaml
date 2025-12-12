@@ -92,6 +92,10 @@ profile:
 # ========================
 # DNS 设置
 # ========================
+al: &al 'https://223.5.5.5/dns-query#直连'
+tx: &tx 'https://doh.pub/dns-query#直连&h3=false'
+gg: &gg 'https://8.8.8.8/dns-query#RULES&ecs=8.8.8.8/32&ecs-override=true'
+cf: &cf 'https://1.1.1.1/dns-query#RULES&ecs=1.1.1.1/32&ecs-override=true'
 dns:
   enable: true
   cache-algorithm: arc
@@ -110,26 +114,13 @@ dns:
   default-nameserver:
     - 'https://223.5.5.5/dns-query'
   nameserver-policy:
-    "rule-set:alibaba_domain,cn_domain,private_domain":
-      - system
-      - 'https://223.5.5.5/dns-query#直连'
-      - 'https://doh.pub/dns-query#直连&h3=false'
-    "rule-set:geolocation-!cn":
-      - 'https://8.8.8.8/dns-query#RULES&ecs=8.8.8.8/32&ecs-override=true'
-      - 'https://1.1.1.1/dns-query#RULES&ecs=1.1.1.1/32&ecs-override=true'
-  proxy-server-nameserver:
-    - 'https://223.5.5.5/dns-query#直连'
-    - 'https://doh.pub/dns-query#直连&h3=false'
-  direct-nameserver:
-    - system
-    - 'https://223.5.5.5/dns-query#直连'
-    - 'https://doh.pub/dns-query#直连&h3=false'
+    "rule-set:proxylite": [*gg,*cf]
+    "rule-set:alibaba_domain,cn_domain,private_domain": [system,*al,*tx]
+  proxy-server-nameserver: [*al,*tx]
+  direct-nameserver: [system,*al,*tx]
   direct-nameserver-follow-policy: true
-  nameserver:
-    - 'https://8.8.8.8/dns-query#RULES&ecs=8.8.8.8/32&ecs-override=true'
-  fallback:
-    - 'https://8.8.8.8/dns-query#RULES&ecs=8.8.8.8/32&ecs-override=true'
-    - 'https://1.1.1.1/dns-query#RULES&ecs=1.1.1.1/32&ecs-override=true'
+  nameserver: [*gg,*cf]
+  fallback: [*gg,*cf]
   fallback-filter:
     geoip: true
     geoip-code: CN
@@ -402,11 +393,11 @@ proxy-groups:
 
 # 规则匹配
 rules:
-  - OR,((RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain)),直连
   - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),⭕ 国外QUIC
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain)),直连
   - OR,((RULE-SET,tailscale),(RULE-SET,ntp_cn)),直连
   - RULE-SET,proxylite,🚀 默认代理
+  - OR,((RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),直连
   - RULE-SET,ai,🤖 ChatGPT
   - RULE-SET,github_domain,👨🏿‍💻 GitHub
   - RULE-SET,youtube_domain,📹 YouTube
@@ -460,3 +451,4 @@ rule-providers:
   apple_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/apple.mrs"}
   alibaba_domain: { <<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/alibaba.mrs"}
   aliasn_ip: {<<: *ip, url: https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/asn/AS45102.mrs}
+  oppo_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/oppo.mrs"}
