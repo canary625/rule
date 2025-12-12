@@ -394,10 +394,8 @@ proxy-groups:
 # 规则匹配
 rules:
   - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),⭕ 国外QUIC
-  - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain)),直连
-  - OR,((RULE-SET,tailscale),(RULE-SET,ntp_cn)),直连
   - RULE-SET,proxylite,🚀 默认代理
-  - OR,((RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),直连
+  - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale),(RULE-SET,ntp_cn),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),直连
   - RULE-SET,ai,🤖 ChatGPT
   - RULE-SET,github_domain,👨🏿‍💻 GitHub
   - RULE-SET,youtube_domain,📹 YouTube
