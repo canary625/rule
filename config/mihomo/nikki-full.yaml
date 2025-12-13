@@ -113,12 +113,12 @@ dns:
     - "*.lan"
   default-nameserver:
     - 'https://223.5.5.5/dns-query'
-  nameserver-policy:
-    "rule-set:proxylite": [*gg,*cf]
-    "rule-set:alibaba_domain,cn_domain,private_domain": [system,*al,*tx]
-  proxy-server-nameserver: [*al,*tx]
   direct-nameserver: [system,*al,*tx]
-  direct-nameserver-follow-policy: true
+  # direct-nameserver-follow-policy: true
+  nameserver-policy:
+    "rule-set:proxylite,bing_domain": [*gg,*cf]
+    "rule-set:alibaba_domain,private_domain,steamcn,epic,gamecn,oppo_domain,cn_domain": [system,*al,*tx]
+  proxy-server-nameserver: [*al,*tx]
   nameserver: [*gg,*cf]
   fallback: [*gg,*cf]
   fallback-filter:
@@ -211,6 +211,7 @@ proxy-groups:
   - {name: 🚀 默认代理, <<: *default_no_allmanual, include-all: true,filter: "^((?!(直连|拒绝)).)*$"}
 #  - {name: 🚀 默认代理, <<: *default}
   - {name: 📹 YouTube, <<: *default}
+  - {name: 🪟 bing, <<: *default}
   - {name: 🍀 Google, <<: *default}
   - {name: 🤖 ChatGPT, <<: *default}
   - {name: 👨🏿‍💻 GitHub, <<: *default}
@@ -399,6 +400,7 @@ rules:
   - RULE-SET,ai,🤖 ChatGPT
   - RULE-SET,github_domain,👨🏿‍💻 GitHub
   - RULE-SET,youtube_domain,📹 YouTube
+  - RULE-SET,bing_domain,🪟 bing
   - OR,((RULE-SET,google_domain),(RULE-SET,google_ip)),🍀 Google
   - RULE-SET,onedrive_domain,🐬 OneDrive
   - RULE-SET,microsoft_domain,🪟 Microsoft
@@ -450,3 +452,4 @@ rule-providers:
   alibaba_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/alibaba.mrs", path: ./rules/alibaba.mrs}
   aliasn_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/asn/AS45102.mrs", path: ./rules/AS45102.mrs}
   oppo_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/oppo.mrs", path: ./rules/oppo.mrs}
+  bing_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.mrs", path: ./rules/bing.mrs}
