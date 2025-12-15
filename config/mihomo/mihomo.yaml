@@ -99,7 +99,7 @@ dns:
   direct-nameserver: [system,*al,*tx]
   direct-nameserver-follow-policy: true
   nameserver-policy:
-    "rule-set:proxylite": [*gg,*q9]
+    "rule-set:dns_ip": [*gg,*q9]
     "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system,*al,*tx]
   nameserver: [*gg,*q9]
 
@@ -127,8 +127,9 @@ sniffer:
 # 规则匹配
 rules:
   - RULE-SET,dns_ip,GDNS
-  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
-  - RULE-SET,proxylite,默认代理
+#  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
+  - RULE-SET,direct_list,DIRECT_LIST
+#  - RULE-SET,proxylite,默认代理
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),LOCAL
   - RULE-SET,ai,AI
   - RULE-SET,github_domain,GitHub
@@ -158,7 +159,7 @@ rule-providers:
   ntpcn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ntp@cn.mrs", path: ./rules/category-ntp@cn.mrs}
   fakeipfilter_domain: {<<: *domain, url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs", path: ./rules/fakeip-filter.mrs}
   private_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs", path: ./rules/private.mrs}
-  proxylite: {<<: *class, url: "https://raw.githubusercontent.com/canary625/rule/refs/heads/main/proxy.list", path: ./rules/proxy.list}
+#  proxylite: {<<: *class, url: "https://raw.githubusercontent.com/canary625/rule/refs/heads/main/proxy.list", path: ./rules/proxy.list}
   steamcn_domain: {<<: *class, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/SteamCN/SteamCN.list", path: ./rules/SteamCN.list}
   epic_domain: {<<: *class, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Epic/Epic.list", path: ./rules/Epic.list}
   gamecn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games@cn.mrs", path: ./rules/category-games@cn.mrs}
@@ -188,14 +189,15 @@ rule-providers:
   netflix_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs", path: ./rules/netflix.mrs}
   apple_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/apple.mrs", path: ./rules/apple.mrs}
   aliasn_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/asn/AS45102.mrs", path: ./rules/AS45102.mrs}
-  dns_ip: {<<: *class, url: "https://raw.githubusercontent.com/canary625/rule/refs/heads/main/proxy_dns", path: ./rules/dns.list}
+  dns_ip: {<<: *class, url: "https://raw.githubusercontent.com/canary625/rule/refs/heads/main/proxy.list", path: ./rules/dns.list}
+  direct_list: {<<: *class, url: "https://raw.githubusercontent.com/canary625/rule/refs/heads/main/direct.list", path: ./rules/direct.list}
 
 proxies: [{name: LOCAL, type: direct, udp: true, ip-version: ipv6-prefer},{name: DROP, type: reject,udp: true}]
 
 
 auto: &auto { type: url-test, tolerance: 50, interval: 300, <<: *use}
 # bal: &bal { type: load-balance, strategy: round-robin, <<: *use, hidden: true }
-fall: &fall { type: fallback,interval: 300,lazy: false ,}
+fall: &fall { type: fallback,interval: 300,lazy: false }
 hk: &hk { filter: '(?i)🇭🇰|香港|\bHK\b|\bhongkong\b|\bhong\s?kong\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/hk.svg' }
 tw: &tw { filter: '(?i)🇹🇼|台湾|\bTW\b|\btaiwan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/tw.svg' }
 jp: &jp { filter: '(?i)🇯🇵|日本|\bJP\b|\bjapan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/jp.svg' }
@@ -230,10 +232,11 @@ proxy-groups:
   - {name: Telegram, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Telegram.webp'}
   - {name: NETFLIX, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Netflix.webp' }
   - {name: PayPal, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/PayPal.webp'}
-  - {name: GAME-CN, <<: [*default],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Steam.webp'}
-  - {name: 国外QUIC, type: select, proxies: [REJECT,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
+  - {name: GAME-CN,type: select, proxies: [LOCAL,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Steam.webp'}
+  - {name: DIRECT_LIST, type: select, proxies: [LOCAL,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/cn.svg'}
+#  - {name: 国外QUIC, type: select, proxies: [REJECT,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
   - {name: 漏网之鱼, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
-  - {name: 所有-自动, <<: *auto, include-all: true, filter: "^((?!(LOCAL|DROP)).)*$"}
+  - {name: 所有-自动, <<: *auto, include-all: true, filter: "^((?!(LOCAL|DROP)).)*$",icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
   - {name: 所有-手动, <<: *select,include-all: true}
   - {name: 香港-故转, <<: *fall,proxies: [香港-手动,香港-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Link.webp'}
   - {name: 香港-自动,<<: [*auto,*hk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
@@ -259,7 +262,7 @@ proxy-groups:
   - {name: 美国-故转, <<: *fall,proxies: [美国-手动,美国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Link.webp'}
   - {name: 美国-自动,<<: [*auto,*us],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
   - {name: 美国-手动, <<: [*select,*us]}
-  - {name: GDNS,  type: select ,<<: *default, filter: "^((?!(默认代理)).)*$", icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Server.webp'}
+  - {name: GDNS,  type: select ,<<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Server.webp'}
   - {name: 其他-故转, <<: *fall,proxies: [其他-手动,其他-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Link.webp'}
   - {name: 其他-自动,<<: [*auto,*other],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
   - {name: 其他-手动, <<: [*select,*other] }
