@@ -5,5 +5,8 @@
 # github加速
 DOMAIN-SUFFIX,jsdelivr.net
 DOMAIN-SUFFIX,gh-proxy.com
+# 杂项
+DOMAIN-SUFFIX,intel.cn
+DOMAIN-SUFFIX,intel.com
 
 
