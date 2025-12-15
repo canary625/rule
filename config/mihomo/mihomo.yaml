@@ -67,16 +67,17 @@ geo-update-interval: 96
 
 # dns
 hosts:
-  dns.alidns.com: [223.5.5.5,223.6.6.6,'2400:3200::1','2400:3200:baba::1']
+  dns.alidns.com: [223.5.5.5,223.6.6.6]# ,'2400:3200::1','2400:3200:baba::1']
   doh.pub: [120.53.53.53,1.12.12.21]
-  dns.google: [8.8.8.8,8.8.4.4,'2001:4860:4860::8888','2001:4860:4860::8844']
-  dns.quad9.net: [9.9.9.9,149.112.112.112,'2620:fe::fe','2620:fe::9']
+  dns.google: [8.8.8.8,8.8.4.4] # ,'2001:4860:4860::8888','2001:4860:4860::8844']
+  dns.quad9.net: [9.9.9.9,149.112.112.112] #,'2620:fe::fe','2620:fe::9']
+  cloudflare-dns.com: [1.1.1.1,1.0.0.1]
   services.googleapis.cn: services.googleapis.com
 
 al: &al 'https://223.5.5.5/dns-query#LOCAL'
 tx: &tx 'https://doh.pub/dns-query#LOCAL&h3=false'
 gg: &gg 'https://8.8.8.8/dns-query#GDNS&ecs=8.8.8.8/32&ecs-override=true'
-q9: &q9 'https://9.9.9.9/dns-query#GDNS&ecs=9.9.9.9/32&ecs-override=true'
+cf: &cf 'https://1.1.1.1/dns-query#GDNS&ecs=1.1.1.1/32&ecs-override=true'
 
 dns:
   enable: true
@@ -99,9 +100,9 @@ dns:
   direct-nameserver: [system,*al,*tx]
   direct-nameserver-follow-policy: true
   nameserver-policy:
-    "rule-set:dns_ip": [*gg,*q9]
+    "rule-set:dns_ip": [*gg,*cf]
     "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system,*al,*tx]
-  nameserver: [*gg,*q9]
+  nameserver: [*gg,*cf]
 
 # 嗅探
 sniffer:
