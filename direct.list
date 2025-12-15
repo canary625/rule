@@ -3,7 +3,7 @@
 # 域名后缀匹配
 # DOMAIN-SUFFIX,gh-proxy.com
 # github加速
-+.jsdelivr.net
-+.gh-proxy.com
+DOMAIN-SUFFIX,jsdelivr.net
+DOMAIN-SUFFIX,gh-proxy.com
 
 
