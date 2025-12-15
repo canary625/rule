@@ -101,7 +101,7 @@ dns:
   direct-nameserver-follow-policy: true
   nameserver-policy:
     "rule-set:dns_ip": [*gg,*cf]
-    "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system,*al,*tx]
+    "rule-set:alibaba_domain,direct_list,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system,*al,*tx]
   nameserver: [*gg,*cf]
 
 # 嗅探
