@@ -130,10 +130,10 @@ sniffer:
 rules:
   - RULE-SET,awavenue-ads-rule,ADS
   - RULE-SET,proxy_list,GDNS
+#  - AND,((DST-PORT,443),(NETWORK,UDP)),国外QUIC  # 绕过大陆
   - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
 #  - AND,((DST-PORT,443),(NETWORK,UDP),(RULE-SET,geolocation-!cn)),国外QUIC
   - RULE-SET,direct_list,DIRECT_LIST
-#  - RULE-SET,proxylite,默认代理
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),LOCAL
   - RULE-SET,ai,AI
   - RULE-SET,github_domain,GitHub
