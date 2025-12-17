@@ -1,6 +1,6 @@
 {
   "config/swipe-in-pages": "true",
-  "config/hidden-group-map": "{\"其他-手动\":false,\"台湾-手动\":false,\"GAME-CN\":true}",
+  "config/hidden-group-map": "{\"其他-手动\":false,\"台湾-手动\":false,\"GAME-CN\":true,\"DIRECT_LIST\":true,\"ADS\":true}",
   "config/emoji": "noto-color-emoji",
   "config/table-sorting": "[]",
   "config/log-filter-enabled": "false",
