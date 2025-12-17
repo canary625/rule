@@ -200,9 +200,9 @@ rule-providers:
 proxies: [{name: LOCAL, type: direct, udp: true, ip-version: ipv6-prefer},{name: DROP, type: reject,udp: true}]
 
 
-auto: &auto { type: url-test, tolerance: 50, interval: 300, <<: *use}
+auto: &auto { type: url-test, tolerance: 50, interval: 300, <<: *use, hidden: true}
 # bal: &bal { type: load-balance, strategy: round-robin, <<: *use, hidden: true }
-fall: &fall { type: fallback,interval: 300,lazy: false }
+fall: &fall { type: fallback,interval: 300,lazy: false, hidden: true }
 hk: &hk { filter: '(?i)🇭🇰|香港|\bHK\b|\bhongkong\b|\bhong\s?kong\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/hk.svg' }
 tw: &tw { filter: '(?i)🇹🇼|台湾|\bTW\b|\btaiwan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/tw.svg' }
 jp: &jp { filter: '(?i)🇯🇵|日本|\bJP\b|\bjapan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/jp.svg' }
