@@ -8,7 +8,7 @@ provider-override-base: &provider_override_base
 proxy-providers:
   Sakuraca:
     <<: *providers
-    url: "https://sakuracat1203.xn--3iq226gfdb94q.com/api/v1/client/subscribe?token=ad1597e66965a34837baa01aae5e0c85"
+    url: ""
     path: ./providers/Sakuraca.yaml
     override:
       <<: *provider_override_base
@@ -16,7 +16,7 @@ proxy-providers:
 
   SaySS:
     <<: *providers
-    url: "https://www.lyntuio.com/s/qfnlwzukywss"
+    url: ""
     path: ./providers/SaySS.yaml
     override:
       <<: *provider_override_base
@@ -24,7 +24,7 @@ proxy-providers:
 
   CockCloud:
     <<: *providers
-    url: "https://su.gwzxwk.com/api/v1/client/subscribe?token=17fce6ef703066069235f8f9f29a087c"
+    url: ""
     path: ./providers/CockCloud.yaml
     override:
       <<: *provider_override_base
