@@ -1,8 +1,8 @@
-vars:
-  interval: &interval 180
-  update: &update 604800
+#vars:
+#  interval: &interval 180
+#  update: &update 604800
 # 订阅配置
-providers: &providers { type: http, interval: *update, proxy: LOCAL,header: { User-Agent: ['clash-verge/v2.4.3','v2rayN'] }, health-check: { enable: true, url: 'https://www.gstatic.com/generate_204', expected-status: 204,  interval: 345600, timeout: 3000, max-failed-times: 2, lazy: false }, exclude-filter: '(?i)套餐|剩余|流量|到期|重置|频道|订阅|官网|禁止|客户端|x|倍|海外|消耗|导航' }
+providers: &providers { type: http, interval: 604800, proxy: LOCAL,header: { User-Agent: ['clash-verge/v2.4.3','v2rayN'] }, health-check: { enable: true, url: 'https://www.gstatic.com/generate_204', expected-status: 204,  interval: 345600, timeout: 3000, max-failed-times: 2, lazy: false }, exclude-filter: '(?i)套餐|剩余|流量|到期|重置|频道|订阅|官网|禁止|客户端|x|倍|海外|消耗|导航' }
 provider-override-base: &provider_override_base
   udp: true
 proxy-providers:
@@ -133,10 +133,10 @@ sniffer:
 rules:
   - RULE-SET,awavenue-ads-rule,ADS
   - RULE-SET,proxy_list,GDNS
-#  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
-  - AND,((DST-PORT,443),(NETWORK,UDP)),国外QUIC # 绕过大陆后使用
   - RULE-SET,direct_list,DIRECT_LIST
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),LOCAL
+#  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,private_domain),(RULE-SET,private_ip,no-resolve),(RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
+  - AND,((DST-PORT,443),(NETWORK,UDP)),国外QUIC # 绕过大陆后使用
   - RULE-SET,ai,AI
   - RULE-SET,github_domain,GitHub
   - RULE-SET,youtube_domain,YouTube
@@ -157,10 +157,10 @@ rules:
 # 规则集
 ## type：可选http/file/inline  behavior：可选domain/ipcidr/classical format：可选yaml/text/mrs
 rule-anchor:
-  ip: &ip {type: http, interval: *update, behavior: ipcidr, format: mrs}
-  domain: &domain {type: http, interval: *update, behavior: domain, format: mrs}
-  class: &class {type: http, interval: *update, behavior: classical, format: text}
-#  ydomain: &ydomain {type: http, interval: *update, behavior: domain, format: yaml}
+  ip: &ip {type: http, interval: 604800, behavior: ipcidr, format: mrs}
+  domain: &domain {type: http, interval: 604800, behavior: domain, format: mrs}
+  class: &class {type: http, interval: 604800, behavior: classical, format: text}
+#  ydomain: &ydomain {type: http, interval: 604800, behavior: domain, format: yaml}
 rule-providers: 
   awavenue-ads-rule: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/refs/heads/main/mrs/AWAvenue-Ads-Rule.mrs", path: ./rules/mrs/awavenue-ads-rule-clash.mrs}
   tailscale_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tailscale.mrs", path: ./rules/mrs/tailscale.mrs}
@@ -202,9 +202,9 @@ rule-providers:
 proxies: [{name: LOCAL, type: direct, udp: true, ip-version: ipv6-prefer},{name: DROP, type: reject,udp: true}]
 
 
-auto: &auto { type: url-test, tolerance: 50, interval: *interval, <<: *use, hidden: true}
+auto: &auto { type: url-test, tolerance: 50, interval: 180,url: 'https://www.gstatic.com/generate_204', <<: *use, hidden: true}
 # bal: &bal { type: load-balance, strategy: round-robin, <<: *use, hidden: true }
-fall: &fall { type: fallback,interval: *interval,lazy: false, hidden: true}
+fall: &fall { type: fallback,interval: 180,lazy: false,url: 'https://www.gstatic.com/generate_204',hidden: true}
 hk: &hk { filter: '(?i)🇭🇰|香港|\bHK\b|\bhongkong\b|\bhong\s?kong\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/hk.svg' }
 tw: &tw { filter: '(?i)🇹🇼|台湾|\bTW\b|\btaiwan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/tw.svg' }
 jp: &jp { filter: '(?i)🇯🇵|日本|\bJP\b|\bjapan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/jp.svg' }
