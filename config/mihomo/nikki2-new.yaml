@@ -2,7 +2,7 @@
 #  interval: &interval 180
 #  update: &update 604800
 # 订阅配置
-providers: &providers { type: http, interval: 604800, proxy: LOCAL,header: { User-Agent: ['clash-verge/v2.4.3','v2rayN'] }, health-check: { enable: true, url: 'https://www.gstatic.com/generate_204', expected-status: 204,  interval: 345600, timeout: 3000, max-failed-times: 2, lazy: false }, exclude-filter: '(?i)套餐|剩余|流量|到期|重置|频道|订阅|官网|禁止|客户端|x|倍|海外|消耗|导航' }
+providers: &providers { type: http, interval: 604800, proxy: LOCAL,header: { User-Agent: ['clash-verge/v2.4.3','v2rayN'] }, health-check: { enable: true, url: 'https://www.gstatic.com/generate_204', expected-status: 204,  interval: 180, timeout: 3000, max-failed-times: 2, lazy: false }, exclude-filter: '(?i)套餐|剩余|流量|到期|重置|频道|订阅|官网|禁止|客户端|x|倍|海外|消耗|导航' }
 provider-override-base: &provider_override_base
   udp: true
 proxy-providers:
