@@ -33,6 +33,41 @@ use: &use { use: [Sakuraca,SaySS,CockCloud]}
 
 select: &select { type: select,use: [Sakuraca,SaySS,CockCloud] }
 
+#vars:
+#  interval: &interval 180
+#  update: &update 604800
+# 订阅配置
+providers: &providers { type: http, interval: 604800, proxy: LOCAL,header: { User-Agent: ['clash-verge/v2.4.3','v2rayN'] }, health-check: { enable: true, url: 'https://www.gstatic.com/generate_204', expected-status: 204,  interval: 180, timeout: 3000, max-failed-times: 2, lazy: false }, exclude-filter: '(?i)套餐|剩余|流量|到期|重置|频道|订阅|官网|禁止|客户端|x|倍|海外|消耗|导航' }
+provider-override-base: &provider_override_base
+  udp: true
+proxy-providers:
+  Sakuraca:
+    <<: *providers
+    url: "https://sakuracat1203.xn--3iq226gfdb94q.com/api/v1/client/subscribe?token=ad1597e66965a34837baa01aae5e0c85"
+    path: ./providers/Sakuraca.yaml
+    override:
+      <<: *provider_override_base
+      additional-prefix: "Sakuraca|"
+
+  SaySS:
+    <<: *providers
+    url: "https://www.lyntuio.com/s/qfnlwzukywss"
+    path: ./providers/SaySS.yaml
+    override:
+      <<: *provider_override_base
+      additional-prefix: "SaySS|"
+
+  CockCloud:
+    <<: *providers
+    url: "https://su.gwzxwk.com/api/v1/client/subscribe?token=17fce6ef703066069235f8f9f29a087c"
+    path: ./providers/CockCloud.yaml
+    override:
+      <<: *provider_override_base
+      additional-prefix: "CockCloud|"
+use: &use { use: [Sakuraca,SaySS,CockCloud]}
+
+select: &select { type: select,use: [Sakuraca,SaySS,CockCloud] }
+
 # 全局配置 
 mixed-port: 7890
 ipv6: true
@@ -98,8 +133,8 @@ dns:
   direct-nameserver-follow-policy: true
   nameserver-policy:
     "rule-set:direct_domain": [system,*al,*tx]
-    "rule-set:awavenue-ads-rule": [rcode://success]
     "rule-set:proxy_domain": [*gg,*cf]
+    "rule-set:awavenue-ads-rule": [rcode://success]
     "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system,*al,*tx]
   nameserver: [*gg,*cf]
 
@@ -128,7 +163,7 @@ sniffer:
 rules:
   - OR,((RULE-SET,proxy_domain),(RULE-SET,proxy_ip,no-resolve)),GDNS
   - OR,((RULE-SET,direct_domain),(RULE-SET,direct_ip,no-resolve)),DIRECT_RULE
-#  - RULE-SET,webrtc_domain,WEBRTC
+#  - OR,((RULE-SET,webrtc_domain),(DST-PORT,3478),(DST-PORT,5349),(DST-PORT,5350),(DST-PORT,19302)),WEBRTC
   - RULE-SET,awavenue-ads-rule,ADS
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),LOCAL
 #  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
@@ -272,6 +307,5 @@ proxy-groups:
   - {name: 其他-自动,<<: [*auto,*other],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 其他-手动, <<: [*select,*other], icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
   - {name: GLOBAL, type: select, include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Globefish.webp'}
-  
   
   
