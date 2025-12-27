@@ -128,6 +128,7 @@ sniffer:
 rules:
   - OR,((RULE-SET,proxy_domain),(RULE-SET,proxy_ip,no-resolve)),GDNS
   - OR,((RULE-SET,direct_domain),(RULE-SET,direct_ip,no-resolve)),DIRECT_RULE
+#  - RULE-SET,webrtc_domain,WEBRTC
   - RULE-SET,awavenue-ads-rule,ADS
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),LOCAL
 #  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
@@ -188,6 +189,7 @@ rule-providers:
   instagram_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/instagram.mrs", path: ./rules/mrs/instagram_domain.mrs}
   proxy_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/proxy_domain.mrs", path: ./rules/mrs/proxy_domain.mrs}
   direct_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/direct_domain.mrs", path: ./rules/mrs/direct_domain.mrs}
+#  webrtc_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/webrtc_domain.mrs", path: ./rules/mrs/webrtc_domain.mrs}
   
   private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs", path: ./rules/mrs/private_ip.mrs}
   cn_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs", path: ./rules/mrs/cn_ip.mrs}
@@ -220,6 +222,7 @@ default_no: &default_no {type: select, proxies: [香港-故转,台湾-故转,日
 proxy-groups:
   - {name: 默认代理, <<: *default_no, filter: "^((?!(LOCAL|DROP)).)*$", icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Global.webp'}
   - {name: ADS, type: select, proxies: [REJECT-DROP,LOCAL,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Adguard.webp' }
+#  - {name: WEBRTC, type: select, proxies: [REJECT-DROP,LOCAL,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Link.webp' }
   - {name: GDNS,  type: select ,<<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Server.webp'}
   - {name: YouTube, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/YouTube.webp'}
   - {name: Google, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Google.webp'}
@@ -239,34 +242,34 @@ proxy-groups:
   - {name: 国外QUIC, type: select, proxies: [DROP,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
   - {name: 国外, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Home.webp'}
   - {name: 漏网之鱼, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
-  - {name: 所有-自动, <<: *auto, include-all: true, filter: "^((?!(LOCAL|DROP)).)*$",icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 所有-自动, <<: *auto, include-all: true, filter: "^((?!(LOCAL|DROP)).)*$",icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 所有-手动, <<: *select,include-all: true}
-  - {name: 香港-故转, <<: *fall,proxies: [香港-手动,香港-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 香港-自动,<<: [*auto,*hk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 香港-故转, <<: *fall,proxies: [香港-手动,香港-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 香港-自动,<<: [*auto,*hk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 香港-手动,<<: [*select,*hk]}
-  - {name: 台湾-故转, <<: *fall,proxies: [台湾-手动,台湾-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 台湾-自动,<<: [*auto,*tw],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 台湾-故转, <<: *fall,proxies: [台湾-手动,台湾-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 台湾-自动,<<: [*auto,*tw],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 台湾-手动, <<: [*select,*tw]}
-  - {name: 日本-故转, <<: *fall,proxies: [日本-手动,日本-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 日本-自动,<<: [*auto,*jp],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 日本-故转, <<: *fall,proxies: [日本-手动,日本-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 日本-自动,<<: [*auto,*jp],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 日本-手动, <<: [*select,*jp]}
-  - {name: 韩国-故转, <<: *fall,proxies: [韩国-手动,韩国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 韩国-自动,<<: [*auto,*kr],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 韩国-故转, <<: *fall,proxies: [韩国-手动,韩国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 韩国-自动,<<: [*auto,*kr],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 韩国-手动, <<: [*select,*kr]}
-  - {name: 新加坡-故转, <<: *fall,proxies: [新加坡-手动,新加坡-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 新加坡-自动,<<: [*auto,*sg],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 新加坡-故转, <<: *fall,proxies: [新加坡-手动,新加坡-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 新加坡-自动,<<: [*auto,*sg],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 新加坡-手动, <<: [*select,*sg]}
-  - {name: 德国-故转, <<: *fall,proxies: [德国-手动,德国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 德国-自动,<<: [*auto,*de],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 德国-故转, <<: *fall,proxies: [德国-手动,德国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 德国-自动,<<: [*auto,*de],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 德国-手动, <<: [*select,*de]}
-  - {name: 英国-故转, <<: *fall,proxies: [英国-手动,英国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 英国-自动,<<: [*auto,*uk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 英国-故转, <<: *fall,proxies: [英国-手动,英国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 英国-自动,<<: [*auto,*uk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 英国-手动, <<: [*select,*uk]}
-  - {name: 美国-故转, <<: *fall,proxies: [美国-手动,美国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 美国-自动,<<: [*auto,*us],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 美国-故转, <<: *fall,proxies: [美国-手动,美国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 美国-自动,<<: [*auto,*us],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 美国-手动, <<: [*select,*us]}
-  - {name: 其他-故转, <<: *fall,proxies: [其他-手动,其他-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bluesky.webp'}
-  - {name: 其他-自动,<<: [*auto,*other],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Auto_Link.webp'}
+  - {name: 其他-故转, <<: *fall,proxies: [其他-手动,其他-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 其他-自动,<<: [*auto,*other],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 其他-手动, <<: [*select,*other], icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
   - {name: GLOBAL, type: select, include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Globefish.webp'}
   
