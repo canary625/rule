@@ -97,9 +97,9 @@ dns:
   direct-nameserver: [system,*al,*tx]
   direct-nameserver-follow-policy: true
   nameserver-policy:
-    "rule-set:direct_list": [system,*al,*tx]
+    "rule-set:direct_domain": [system,*al,*tx]
     "rule-set:awavenue-ads-rule": [rcode://success]
-    "rule-set:proxy_list": [*gg,*cf]
+    "rule-set:proxy_domain": [*gg,*cf]
     "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system,*al,*tx]
   nameserver: [*gg,*cf]
 
@@ -126,8 +126,8 @@ sniffer:
 
 # 规则匹配
 rules:
-  - RULE-SET,proxy_list,GDNS
-  - RULE-SET,direct_list,DIRECT_LIST
+  - OR,((RULE-SET,proxy_domain),(RULE-SET,proxy_ip,no-resolve)),GDNS
+  - OR,((RULE-SET,direct_domain),(RULE-SET,direct_ip,no-resolve)),DIRECT_RULE
   - RULE-SET,awavenue-ads-rule,ADS
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),LOCAL
 #  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
@@ -135,7 +135,7 @@ rules:
   - RULE-SET,ai,AI
   - RULE-SET,github_domain,GitHub
   - RULE-SET,youtube_domain,YouTube
-  - OR,((RULE-SET,google_domain),(RULE-SET,google_ip)),Google
+  - OR,((RULE-SET,google_domain),(RULE-SET,google_ip,no-resolve)),Google
   - RULE-SET,bing_domain,Bing
   - RULE-SET,onedrive_domain,OneDrive
   - RULE-SET,microsoft_domain,Microsoft
@@ -156,7 +156,7 @@ rules:
 rule-anchor:
   ip: &ip {type: http, interval: 604800, behavior: ipcidr, format: mrs}
   domain: &domain {type: http, interval: 604800, behavior: domain, format: mrs}
-  class: &class {type: http, interval: 604800, behavior: classical, format: text}
+#  class: &class {type: http, interval: 604800, behavior: classical, format: text}
 #  ydomain: &ydomain {type: http, interval: 604800, behavior: domain, format: yaml}
 rule-providers: 
   awavenue-ads-rule: {<<: *domain, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs", path: ./rules/mrs/awavenue-ads-rule-clash.mrs}
@@ -164,8 +164,8 @@ rule-providers:
   ntpcn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ntp@cn.mrs", path: ./rules/mrs/category-ntp@cn.mrs}
   fakeipfilter_domain: {<<: *domain, url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs", path: ./rules/mrs/fakeip-filter.mrs}
   private_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs", path: ./rules/mrs/private.mrs}
-  steamcn_domain: {<<: *class, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/SteamCN/SteamCN.list", path: ./rules/list/steamcn_domain.list}
-  epic_domain: {<<: *class, url: "https://raw.githubusercontent.com/blackmatrix7/ios_rule_script/refs/heads/master/rule/Clash/Epic/Epic.list", path: ./rules/list/epic_domain.list}
+  steamcn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs", path: ./rules/mrs/steam@cn_domain.mrs}
+  epic_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/epic.mrs", path: ./rules/mrs/epic_domain.mrs}
   gamecn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games@cn.mrs", path: ./rules/mrs/category-games@cn_domain.mrs}
   ai: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs", path: ./rules/mrs/category-ai-!cn_domain.mrs}
   youtube_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs", path: ./rules/mrs/youtube_domain.mrs}
@@ -186,7 +186,8 @@ rule-providers:
   alibaba_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/alibaba.mrs", path: ./rules/mrs/alibaba_domain.mrs}
   x_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs", path: ./rules/mrs/x_domain.mrs}
   instagram_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/instagram.mrs", path: ./rules/mrs/instagram_domain.mrs}
-  
+  proxy_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/proxy_domain.mrs", path: ./rules/mrs/proxy_domain.mrs}
+  direct_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/direct_domain.mrs", path: ./rules/mrs/direct_domain.mrs}
   
   private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs", path: ./rules/mrs/private_ip.mrs}
   cn_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs", path: ./rules/mrs/cn_ip.mrs}
@@ -195,8 +196,8 @@ rule-providers:
   netflix_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs", path: ./rules/mrs/netflix_ip.mrs}
   apple_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/apple.mrs", path: ./rules/mrs/apple_ip.mrs}
   aliasn_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/asn/AS45102.mrs", path: ./rules/mrs/AS45102.mrs}
-  proxy_list: {<<: *class, url: "https://raw.githubusercontent.com/canary625/rule/refs/heads/main/proxy.list", path: ./rules/list/proxy.list}
-  direct_list: {<<: *class, url: "https://raw.githubusercontent.com/canary625/rule/refs/heads/main/direct.list", path: ./rules/list/direct.list}
+  proxy_ip: {<<: *ip, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/proxy_ip.mrs", path: ./rules/mrs/proxy_ip.mrs}
+  direct_ip: {<<: *ip, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/direct_ip.mrs", path: ./rules/mrs/direct_ip.mrs}
 
 proxies: [{name: LOCAL, type: direct, udp: true, ip-version: ipv6-prefer},{name: DROP, type: reject,udp: true}]
 
@@ -234,7 +235,7 @@ proxy-groups:
   - {name: NETFLIX, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Netflix.webp' }
   - {name: PayPal, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/PayPal.webp'}
   - {name: GAME-CN,type: select, proxies: [LOCAL,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Steam.webp'}
-  - {name: DIRECT_LIST, type: select, proxies: [LOCAL,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/China.webp'}
+  - {name: DIRECT_RULE, type: select, proxies: [LOCAL,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/China.webp'}
   - {name: 国外QUIC, type: select, proxies: [DROP,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
   - {name: 国外, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Home.webp'}
   - {name: 漏网之鱼, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
