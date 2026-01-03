@@ -1,38 +1,3 @@
-vars:
-  interval: &interval 300
-  update: &update 604800
-# 订阅配置
-providers: &providers { type: http, interval: *update, proxy: LOCAL,header: { User-Agent: ['clash-verge/v2.4.3','clash.meta','mihomo'] }, health-check: { enable: true, url: 'https://www.gstatic.com/generate_204', expected-status: 204,  interval: *interval, timeout: 3000, max-failed-times: 2, lazy: false }, exclude-filter: '(?i)套餐|剩余|流量|到期|重置|频道|订阅|官网|禁止|客户端|x|倍|海外|消耗|导航' }
-provider-override-base: &provider_override_base
-  udp: true
-proxy-providers:
-  Sakuraca:
-    <<: *providers
-    url: "url1"
-    path: ./providers/Sakuraca.yaml
-    override:
-      <<: *provider_override_base
-      additional-prefix: "Sakuraca|"
-
-  SaySS:
-    <<: *providers
-    url: "url2"
-    path: ./providers/SaySS.yaml
-    override:
-      <<: *provider_override_base
-      additional-prefix: "SaySS|"
-
-  CockCloud:
-    <<: *providers
-    url: "url3"
-    path: ./providers/CockCloud.yaml
-    override:
-      <<: *provider_override_base
-      additional-prefix: "CockCloud|"
-use: &use { use: [Sakuraca,SaySS,CockCloud]}
-
-select: &select { type: select,use: [Sakuraca,SaySS,CockCloud] }
-
 # 全局配置 
 mixed-port: 7890
 ipv6: true
@@ -46,7 +11,7 @@ find-process-mode: off
 global-client-fingerprint: random
 disable-keep-alive: false
 keep-alive-interval: 30
-keep-alive-idle: 300
+keep-alive-idle: 600
 etag-support: true
 global-ua: mihomo
 
@@ -99,7 +64,7 @@ dns:
   nameserver-policy:
     "rule-set:direct_domain": [system,*cn1,*cn2]
     "rule-set:proxy_domain": [*gw1,*gw2]
-    "rule-set:awavenue-ads-rule,category-ads-all": [rcode://name_error]
+#    "rule-set:awavenue-ads-rule,category-ads-all": [rcode://name_error]
     "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system,*cn1,*cn2]
   nameserver: [*gw1,*gw2]
 
@@ -125,7 +90,7 @@ rules:
   - OR,((RULE-SET,direct_domain),(RULE-SET,direct_ip,no-resolve)),DIRECT_RULE
   - OR,((RULE-SET,proxy_domain),(RULE-SET,proxy_ip,no-resolve)),GDNS
 #  - OR,((RULE-SET,webrtc_domain),(DST-PORT,3478),(DST-PORT,5349),(DST-PORT,5350),(DST-PORT,19302)),WEBRTC
-  - OR,((RULE-SET,awavenue-ads-rule),(RULE-SET,category-ads-all)),ADS
+#  - OR,((RULE-SET,awavenue-ads-rule),(RULE-SET,category-ads-all)),ADS
   - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),直连
 #  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
   - AND,((DST-PORT,443),(NETWORK,UDP)),国外QUIC   # 绕过大陆后使用
@@ -156,8 +121,8 @@ rule-anchor:
 #  class: &class {type: http, interval: *update, behavior: classical, format: text}
 #  ydomain: &ydomain {type: http, interval: *update, behavior: domain, format: yaml}
 rule-providers:
-  category-ads-all: { <<: *domain, url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs', path: ./rules/mrs/category-ads-all.mrs }
-  awavenue-ads-rule: {<<: *domain, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs", path: ./rules/mrs/awavenue-ads-rule-clash.mrs}
+#  category-ads-all: { <<: *domain, url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs', path: ./rules/mrs/category-ads-all.mrs }
+#  awavenue-ads-rule: {<<: *domain, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs", path: ./rules/mrs/awavenue-ads-rule-clash.mrs}
   tailscale_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tailscale.mrs", path: ./rules/mrs/tailscale.mrs}
   ntpcn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ntp@cn.mrs", path: ./rules/mrs/category-ntp@cn.mrs}
 #  fakeipfilter_domain: {<<: *domain, url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs", path: ./rules/mrs/fakeip-filter.mrs}
@@ -220,7 +185,7 @@ default_l: &default_l {type: select, proxies: [直连,默认代理,香港-故转
 proxy-groups:
   - { name: 直连, type: select, proxies: [LOCAL], url: 'https://223.5.5.5/generate_204', expected-status: 204, interval: 7200, timeout: 3000, lazy: false, hidden: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/DIRECT.webp' }
   - {name: 默认代理, <<: *default_no, filter: "^((?!(LOCAL|拒绝|直连)).)*$", icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Global.webp'}
-  - {name: ADS, type: select, proxies: [REJECT-DROP,直连,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Adguard.webp' }
+#  - {name: ADS, type: select, proxies: [REJECT-DROP,直连,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Adguard.webp' }
 #  - {name: WEBRTC, type: select, proxies: [REJECT-DROP,直连,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Link.webp' }
   - {name: GDNS,  type: select ,<<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Server.webp'}
   - {name: YouTube, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/YouTube.webp'}
@@ -242,7 +207,7 @@ proxy-groups:
   - {name: 国外, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Home.webp'}
   - {name: 漏网之鱼, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
   - {name: 所有-自动, <<: *auto, include-all: true, filter: "^((?!(LOCAL|拒绝|直连)).)*$",icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
-  - {name: 所有-手动, <<: *select,include-all: true}
+  - {name: 所有-手动, <<: *select,include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
   - {name: 香港-故转, <<: *fall,proxies: [香港-手动,香港-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
   - {name: 香港-自动,<<: [*auto,*hk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 香港-手动,<<: [*select,*hk]}
