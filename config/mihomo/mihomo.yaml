@@ -13,7 +13,18 @@ disable-keep-alive: false
 keep-alive-interval: 30
 keep-alive-idle: 600
 etag-support: true
+authentication: ['canary:canary02625']
+skip-auth-prefixes: ['127.0.0.1/8','::1/128','192.168.8.128/25','192.168.9.0/24','192.168.100.0/24']
 global-ua: mihomo
+
+# 入站代理
+listeners:
+- name: mixed-in
+  type: mixed
+  port: 1080
+  listen: 0.0.0.0
+  udp: true
+#  proxy: 默认代理
 
 # 面板
 external-controller: 0.0.0.0:9090
@@ -236,6 +247,4 @@ proxy-groups:
   - {name: 其他-自动,<<: [*auto,*other],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 其他-手动, <<: [*select,*other], icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
   - {name: GLOBAL, type: select, include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Globefish.webp'}
-  
-  
   
