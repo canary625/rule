@@ -18,12 +18,12 @@ skip-auth-prefixes: ['127.0.0.1/8','::1/128','192.168.8.128/25','192.168.9.0/24'
 global-ua: mihomo
 
 # 入站代理
-listeners:
-- name: mixed-in
-  type: mixed
-  port: 1080
-  listen: 0.0.0.0
-  udp: true
+# listeners:
+# - name: mixed-in
+#   type: mixed
+#   port: 1080
+#   listen: 0.0.0.0
+#   udp: true
 #  proxy: 默认代理
 
 # 面板
