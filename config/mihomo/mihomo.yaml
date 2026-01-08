@@ -55,8 +55,10 @@ hosts:
 
 cn1: &cn1 'https://223.5.5.5/dns-query#直连' #&disable-ipv6=true'
 cn2: &cn2 'https://doh.pub/dns-query#直连&h3=false' #&disable-ipv6=true'
-gw1: &gw1 'https://8.8.8.8/dns-query#GDNS' #&ecs=8.8.8.8/32&ecs-override=true'  #&disable-ipv6=true'
-gw2: &gw2 'https://1.1.1.1/dns-query#GDNS' #&ecs=1.1.1.1/32&ecs-override=true'   #&disable-ipv6=true'
+gw1: &gw1 'https://8.8.8.8/dns-query#GDNS&disable-ipv6=true' #&ecs=8.8.8.8/32&ecs-override=true'  #&disable-ipv6=true'
+gw2: &gw2 'https://1.1.1.1/dns-query#GDNS&disable-ipv6=true' #&ecs=1.1.1.1/32&ecs-override=true'   #&disable-ipv6=true'
+# gw1: &gw1 'https://8.8.8.8/dns-query#GDNS'
+# gw2: &gw2 'https://1.1.1.1/dns-query#GDNS'
 
 dns:
   enable: true
