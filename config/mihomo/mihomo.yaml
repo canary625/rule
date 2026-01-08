@@ -177,10 +177,10 @@ rule-providers:
 proxies: [{name: LOCAL, type: direct, udp: true, ip-version: ipv6-prefer},{name: 拒绝, type: reject,udp: true}]
 
 
-auto: &auto { type: url-test, tolerance: 50, interval: *interval,url: 'https://www.gstatic.com/generate_204', <<: *use, hidden: true}
+auto: &auto { type: url-test, tolerance: 50, interval: *interval,url: 'https://www.gstatic.com/generate_204',ip-version: ipv4-prefer, <<: *use, hidden: true}
 # bal: &bal { type: load-balance, strategy: round-robin, <<: *use, hidden: true }
-fall: &fall { type: fallback,interval: *interval,lazy: false,url: 'https://www.gstatic.com/generate_204',hidden: true}
-hk: &hk { filter: '(?i)🇭🇰|香港|\bHK\b|\bhongkong\b|\bhong\s?kong\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/hk.svg' }
+fall: &fall { type: fallback,interval: *interval,lazy: false,url: 'https://www.gstatic.com/generate_204',hidden: true,ip-version: ipv4-prefer}
+hk: &hk { filter: '(?i)🇭🇰|香港|\bHK\b|\bhongkong\b|\bhong\s?kong\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/hk.svg'}
 tw: &tw { filter: '(?i)🇹🇼|台湾|\bTW\b|\btaiwan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/tw.svg' }
 jp: &jp { filter: '(?i)🇯🇵|日本|\bJP\b|\bjapan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/jp.svg' }
 sg: &sg { filter: '(?i)🇸🇬|新加坡|狮城|\bSG\b|\bsingapore\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/sg.svg' }
@@ -189,9 +189,9 @@ us: &us { filter: '(?i)🇺🇸|美国|\bUS\b|\bunitedstates\b|\bunited\s?states
 de: &de { filter: '(?i)🇩🇪|德国|\bDE\b|\bgermany\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/de.svg' }
 uk: &uk { filter: '(?i)🇬🇧|英国|\bUK\b|\bGB\b|\bunitedkingdom\b|\bunited\s?kingdom\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/gb.svg' }
 other: &other {filter: "^((?!(直连|REJECT|拒绝|直连|🇩🇪|德国|\bDE\b|\bgermany\b|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"}
-default: &default {type: select, proxies: [默认代理,香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,直连,拒绝] }
-default_no: &default_no {type: select, proxies: [香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,直连,拒绝] }
-default_l: &default_l {type: select, proxies: [直连,默认代理,香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,拒绝] }
+default: &default {type: select, proxies: [默认代理,香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,直连,拒绝] ,ip-version: ipv4-prefer}
+default_no: &default_no {type: select, proxies: [香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,直连,拒绝],ip-version: ipv4-prefer }
+default_l: &default_l {type: select, proxies: [直连,默认代理,香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,拒绝] ,ip-version: ipv4-prefer}
 
 proxy-groups:
   - { name: 直连, type: select, proxies: [LOCAL], url: 'https://223.5.5.5/generate_204', expected-status: 204, interval: 7200, timeout: 3000, lazy: false, hidden: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/DIRECT.webp' }
@@ -217,8 +217,8 @@ proxy-groups:
   - {name: 国外QUIC, type: select, proxies: [拒绝,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
   - {name: 国外, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Home.webp'}
   - {name: 漏网之鱼, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
-  - {name: 所有-自动, <<: *auto, include-all: true, filter: "^((?!(LOCAL|拒绝|直连)).)*$",icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
-  - {name: 所有-手动, <<: *select,include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
+  - {name: 所有-自动, <<: *auto, include-all: true,ip-version: ipv4-prefer, filter: "^((?!(LOCAL|拒绝|直连)).)*$",icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 所有-手动, <<: *select,include-all: true, ip-version: ipv4-prefer, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
   - {name: 香港-故转, <<: *fall,proxies: [香港-手动,香港-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
   - {name: 香港-自动,<<: [*auto,*hk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 香港-手动,<<: [*select,*hk]}
@@ -246,5 +246,7 @@ proxy-groups:
   - {name: 其他-故转, <<: *fall,proxies: [其他-手动,其他-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
   - {name: 其他-自动,<<: [*auto,*other],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
   - {name: 其他-手动, <<: [*select,*other], icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
-  - {name: GLOBAL, type: select, include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Globefish.webp'}
+  - {name: GLOBAL, type: select, include-all: true,ip-version: ipv4-prefer, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Globefish.webp'}
+  
+  
   
