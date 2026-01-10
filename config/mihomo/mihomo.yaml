@@ -83,7 +83,7 @@ dns:
 
 # 嗅探
 sniffer:
-  enable: true
+  enable: false
   force-dns-mapping: true
   parse-pure-ip: true
   override-destination: true
@@ -95,7 +95,7 @@ sniffer:
     - "rule-set:direct_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,alibaba_domain,cn_domain" #fakeipfilter_domain"
   force-domain:
     - "rule-set:netflix_domain,youtube_domain"
-  skip-src-address:
+  skip-dst-address:
     - "rule-set:private_ip,telegram_ip,direct_ip,google_ip,cn_ip"
 
 # 规则匹配
