@@ -77,7 +77,7 @@ dns:
   nameserver-policy:
     "rule-set:direct_domain": [system] #,*cn1,*cn2]
     "rule-set:proxy_domain": [*gw1,*gw2]
-#    "rule-set:awavenue-ads-rule,category-ads-all": [rcode://success]
+    "rule-set:awavenue-ads-rule,category-ads-all": [rcode://success]
     "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system] #,*cn1,*cn2]
   nameserver: [*gw1,*gw2]
 
