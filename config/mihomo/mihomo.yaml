@@ -31,8 +31,8 @@ external-controller: 0.0.0.0:9090
 # select: '密码'
 external-ui: ui
 external-ui-url: 'https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip'
-# external-ui-name: zashboard
-profile: { store-selected: true, store-fake-ip: true }
+# external-ui-name: z
+profile: { store-selected: true, store-fake-ip: false }
 # experimental: { quic-go-disable-gso: true, quic-go-disable-ecn: false, dialer-ip4p-convert: false }
 
 # geo下载链接 
