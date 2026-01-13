@@ -1,0 +1,262 @@
+vars:
+  interval: &interval 300
+  update: &update 604800
+# 全局配置 
+mixed-port: 26250
+ipv6: true
+allow-lan: true
+bind-address: '*'
+mode: rule
+log-level: error
+unified-delay: true
+tcp-concurrent: true
+find-process-mode: off
+global-client-fingerprint: chrome
+disable-keep-alive: false
+keep-alive-interval: 30
+keep-alive-idle: 600
+etag-support: true
+authentication: ['canary:canary02625']
+skip-auth-prefixes: ['127.0.0.1/8','::1/128','192.168.8.128/25','192.168.9.0/24','192.168.100.0/24']
+global-ua: mihomo
+
+# 入站代理
+# listeners:
+# - name: mixed-in
+#   type: mixed
+#   port: 1080
+#   listen: 0.0.0.0
+#   udp: true
+#  proxy: 默认代理
+
+# 面板
+external-controller: 0.0.0.0:9090
+# select: '密码'
+external-ui: ui
+external-ui-url: 'https://gh-proxy.com/github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages.zip'
+external-ui-name: z
+profile: { store-selected: true, store-fake-ip: true }
+# experimental: { quic-go-disable-gso: true, quic-go-disable-ecn: false, dialer-ip4p-convert: false }
+
+# geo下载链接 
+geox-url:
+  geosite: https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geosite.dat
+  mmdb: https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/country-lite.mmdb
+  geoip: https://gh-proxy.com/https://github.com/MetaCubeX/meta-rules-dat/releases/download/latest/geoip-lite.dat
+  asn: https://gh-proxy.com/https://github.com/xishang0128/geoip/releases/download/latest/GeoLite2-ASN.mmdb
+# geo-auto-update: true
+# geo-update-interval: 96
+
+# dns
+hosts:
+  dns.alidns.com: [223.5.5.5,223.6.6.6]# ,'2400:3200::1','2400:3200:baba::1']
+  doh.pub: [120.53.53.53,1.12.12.21]
+  dns.google: [8.8.8.8,8.8.4.4] # ,'2001:4860:4860::8888','2001:4860:4860::8844']
+  dns.quad9.net: [9.9.9.9,149.112.112.112] #,'2620:fe::fe','2620:fe::9']
+  cloudflare-dns.com: [1.1.1.1,1.0.0.1]
+  services.googleapis.cn: services.googleapis.com
+
+cn1: &cn1 'https://223.5.5.5/dns-query#直连' #&disable-ipv6=true'
+cn2: &cn2 'https://doh.pub/dns-query#直连&h3=false' #&disable-ipv6=true'
+# gw1: &gw1 'https://8.8.8.8/dns-query#GDNS&disable-ipv6=true' #&ecs=8.8.8.8/32&ecs-override=true'  #&disable-ipv6=true'
+# gw2: &gw2 'https://1.1.1.1/dns-query#GDNS&disable-ipv6=true' #&ecs=1.1.1.1/32&ecs-override=true'   #&disable-ipv6=true'
+gw1: &gw1 'https://8.8.8.8/dns-query#GDNS'
+gw2: &gw2 'https://1.1.1.1/dns-query#GDNS'
+
+dns:
+  enable: true
+  cache-algorithm: arc
+  listen: 0.0.0.0:1053
+  ipv6: true
+  respect-rules: false
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.0/16
+  fake-ip-range6: fd99:abcd:ef00::1/64
+  # fake-ip-ttl: 1
+  fake-ip-filter-mode: blacklist
+  fake-ip-filter: ['RULE-SET:direct_domain,alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,fakeipfilter_domain,cn_domain']
+  prefer-h3: true
+  use-hosts: true
+  use-system-hosts: true
+  default-nameserver: ['223.5.5.5','223.6.6.6']
+  proxy-server-nameserver: [*cn1,*cn2]
+  nameserver: [*gw1,*gw2]
+  direct-nameserver: [system] #,*cn1,*cn2]
+  direct-nameserver-follow-policy: true
+  nameserver-policy:
+    "rule-set:direct_domain": [system] #,*cn1,*cn2]
+    "rule-set:proxy_domain": [*gw1,*gw2]
+    "rule-set:awavenue-ads-rule,category-ads-all": [rcode://success]
+    "rule-set:alibaba_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,cn_domain": [system] #,*cn1,*cn2]
+
+# 嗅探
+sniffer:
+  enable: false
+  force-dns-mapping: true
+  parse-pure-ip: true
+  override-destination: true
+  sniff:
+    HTTP: { ports: [80,8080-8880,2052,2082,2086,2095], override-destination: true }
+    TLS: { ports: [443,8443,2053,2083,2087,2096], override-destination: true }
+    QUIC: { ports: [443,8443,2053,2083,2087,2096], override-destination: true }
+  skip-domain:
+    - "rule-set:direct_domain,private_domain,steamcn_domain,epic_domain,gamecn_domain,oppo_domain,alibaba_domain,cn_domain,fakeipfilter_domain"
+  force-domain:
+    - "rule-set:netflix_domain,youtube_domain"
+  skip-dst-address:
+    - "rule-set:private_ip,telegram_ip,direct_ip,google_ip,cn_ip"
+
+# 规则匹配
+rules:
+  - OR,((RULE-SET,direct_domain),(RULE-SET,direct_ip,no-resolve)),DIRECT_RULE
+  - OR,((RULE-SET,proxy_domain),(RULE-SET,proxy_ip,no-resolve)),GDNS
+#  - OR,((RULE-SET,webrtc_domain),(DST-PORT,3478),(DST-PORT,5349),(DST-PORT,5350),(DST-PORT,19302)),WEBRTC
+#  - OR,((RULE-SET,awavenue-ads-rule),(RULE-SET,category-ads-all)),ADS
+  - OR,((RULE-SET,private_ip,no-resolve),(RULE-SET,private_domain),(RULE-SET,tailscale_domain),(RULE-SET,ntpcn_domain),(RULE-SET,aliasn_ip,no-resolve),(RULE-SET,alibaba_domain),(RULE-SET,oppo_domain)),直连
+#  - AND,((DST-PORT,443),(NETWORK,UDP),(NOT,((OR,((RULE-SET,cn_domain),(RULE-SET,cn_ip,no-resolve)))))),国外QUIC
+  - AND,((DST-PORT,443),(NETWORK,UDP)),国外QUIC   # 绕过大陆后使用
+  - RULE-SET,ai,AI
+  - RULE-SET,github_domain,GitHub
+  - RULE-SET,youtube_domain,YouTube
+  - OR,((RULE-SET,google_domain),(RULE-SET,google_ip,no-resolve)),Google
+  - RULE-SET,bing_domain,Bing
+  - RULE-SET,onedrive_domain,OneDrive
+  - RULE-SET,microsoft_domain,Microsoft
+  - RULE-SET,tiktok_domain,TikTok
+  - RULE-SET,instagram_domain,Instagram
+  - RULE-SET,x_domain,X
+  - OR,((RULE-SET,telegram_domain),(RULE-SET,telegram_ip,no-resolve)),Telegram
+  - OR,((RULE-SET,netflix_domain),(RULE-SET,netflix_ip,no-resolve)),NETFLIX
+  - RULE-SET,paypal_domain,PayPal
+  - OR,((RULE-SET,apple_ip,no-resolve),(RULE-SET,apple_domain)),直连
+  - OR,((RULE-SET,steamcn_domain),(RULE-SET,epic_domain),(RULE-SET,gamecn_domain)),GAME-CN
+  - RULE-SET,geolocation-!cn,国外
+  - OR,((RULE-SET,cn_domain),(RULE-SET,cn_ip)),直连
+  - MATCH,漏网之鱼
+   
+# 规则集
+## type：可选http/file/inline  behavior：可选domain/ipcidr/classical format：可选yaml/text/mrs
+rule-anchor:
+  ip: &ip {type: http, interval: *update, behavior: ipcidr, format: mrs}
+  domain: &domain {type: http, interval: *update, behavior: domain, format: mrs}
+#  class: &class {type: http, interval: *update, behavior: classical, format: text}
+#  ydomain: &ydomain {type: http, interval: *update, behavior: domain, format: yaml}
+rule-providers:
+  category-ads-all: { <<: *domain, url: 'https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ads-all.mrs', path: ./rules/mrs/category-ads-all.mrs }
+  awavenue-ads-rule: {<<: *domain, url: "https://raw.githubusercontent.com/TG-Twilight/AWAvenue-Ads-Rule/main/Filters/AWAvenue-Ads-Rule-Clash.mrs", path: ./rules/mrs/awavenue-ads-rule-clash.mrs}
+  tailscale_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tailscale.mrs", path: ./rules/mrs/tailscale.mrs}
+  ntpcn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ntp@cn.mrs", path: ./rules/mrs/category-ntp@cn.mrs}
+  fakeipfilter_domain: {<<: *domain, url: "https://raw.githubusercontent.com/wwqgtxx/clash-rules/release/fakeip-filter.mrs", path: ./rules/mrs/fakeip-filter.mrs}
+  private_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/private.mrs", path: ./rules/mrs/private.mrs}
+  steamcn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/steam@cn.mrs", path: ./rules/mrs/steam@cn_domain.mrs}
+  epic_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/epicgames.mrs", path: ./rules/mrs/epic_domain.mrs}
+  gamecn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-games@cn.mrs", path: ./rules/mrs/category-games@cn_domain.mrs}
+  ai: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/category-ai-!cn.mrs", path: ./rules/mrs/category-ai-!cn_domain.mrs}
+  youtube_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/youtube.mrs", path: ./rules/mrs/youtube_domain.mrs}
+  google_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/google.mrs", path: ./rules/mrs/google_domain.mrs}
+  github_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/github.mrs", path: ./rules/mrs/github_domain.mrs}
+  telegram_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/telegram.mrs", path: ./rules/mrs/telegram_domain.mrs}
+  netflix_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/netflix.mrs", path: ./rules/mrs/netflix_domain.mrs}
+  paypal_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/paypal.mrs", path: ./rules/mrs/paypal_domain.mrs}
+  onedrive_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/onedrive.mrs", path: ./rules/mrs/onedrive_domain.mrs}
+  microsoft_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/microsoft.mrs", path: ./rules/mrs/microsoft_domain.mrs}
+  apple_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/apple.mrs", path: ./rules/mrs/apple_domain.mrs}
+#  speedtest_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/ookla-speedtest.mrs", path: ./rules/mrs/ookla-speedtest_domain.mrs}
+  tiktok_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/tiktok.mrs", path: ./rules/mrs/tiktok_domain.mrs}
+  geolocation-!cn: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/geolocation-!cn.mrs", path: ./rules/mrs/geolocation-!cn_domain.mrs}
+  cn_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/cn.mrs", path: ./rules/mrs/cn_domain.mrs}
+  oppo_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/oppo.mrs", path: ./rules/mrs/oppo_domain.mrs}
+  bing_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/bing.mrs", path: ./rules/mrs/bing_domain.mrs} 
+  alibaba_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/alibaba.mrs", path: ./rules/mrs/alibaba_domain.mrs}
+  x_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/x.mrs", path: ./rules/mrs/x_domain.mrs}
+  instagram_domain: {<<: *domain, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geosite/instagram.mrs", path: ./rules/mrs/instagram_domain.mrs}
+  proxy_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/proxy_domain.mrs", path: ./rules/mrs/proxy_domain.mrs}
+  direct_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/direct_domain.mrs", path: ./rules/mrs/direct_domain.mrs}
+#  webrtc_domain: {<<: *domain, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/webrtc_domain.mrs", path: ./rules/mrs/webrtc_domain.mrs}
+  
+  private_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/private.mrs", path: ./rules/mrs/private_ip.mrs}
+  cn_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/cn.mrs", path: ./rules/mrs/cn_ip.mrs}
+  google_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/google.mrs", path: ./rules/mrs/google_ip.mrs}
+  telegram_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/telegram.mrs", path: ./rules/mrs/telegram_ip.mrs}
+  netflix_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo/geoip/netflix.mrs", path: ./rules/mrs/netflix_ip.mrs}
+  apple_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/meta/geo-lite/geoip/apple.mrs", path: ./rules/mrs/apple_ip.mrs}
+  aliasn_ip: {<<: *ip, url: "https://raw.githubusercontent.com/MetaCubeX/meta-rules-dat/refs/heads/meta/asn/AS45102.mrs", path: ./rules/mrs/AS45102.mrs}
+  proxy_ip: {<<: *ip, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/proxy_ip.mrs", path: ./rules/mrs/proxy_ip.mrs}
+  direct_ip: {<<: *ip, url: "https://raw.githubusercontent.com/canary625/proxy/main/mrs/direct_ip.mrs", path: ./rules/mrs/direct_ip.mrs}
+
+proxies: [{name: LOCAL, type: direct, udp: true, ip-version: ipv6-prefer},{name: 拒绝, type: reject,udp: true}]
+
+
+auto: &auto { type: url-test, tolerance: 50, interval: *interval,url: 'https://www.gstatic.com/generate_204', <<: *use, hidden: true}
+# bal: &bal { type: load-balance, strategy: round-robin, <<: *use, hidden: true }
+fall: &fall { type: fallback,interval: *interval,lazy: false,url: 'https://www.gstatic.com/generate_204',hidden: true}
+hk: &hk { filter: '(?i)🇭🇰|香港|\bHK\b|\bhongkong\b|\bhong\s?kong\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/hk.svg' }
+tw: &tw { filter: '(?i)🇹🇼|台湾|\bTW\b|\btaiwan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/tw.svg' }
+jp: &jp { filter: '(?i)🇯🇵|日本|\bJP\b|\bjapan\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/jp.svg' }
+sg: &sg { filter: '(?i)🇸🇬|新加坡|狮城|\bSG\b|\bsingapore\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/sg.svg' }
+kr: &kr { filter: '(?i)🇰🇷|韩国|\bKR\b|\bkorea\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/kr.svg' }
+us: &us { filter: '(?i)🇺🇸|美国|\bUS\b|\bunitedstates\b|\bunited\s?states\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/us.svg' }
+de: &de { filter: '(?i)🇩🇪|德国|\bDE\b|\bgermany\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/de.svg' }
+uk: &uk { filter: '(?i)🇬🇧|英国|\bUK\b|\bGB\b|\bunitedkingdom\b|\bunited\s?kingdom\b', icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/flag/gb.svg' }
+other: &other {filter: "^((?!(直连|REJECT|拒绝|直连|🇩🇪|德国|\bDE\b|\bgermany\b|广港|香港|HK|Hong Kong|🇭🇰|HongKong|广台|台湾|台灣|TW|Tai Wan|🇹🇼|TaiWan|Taiwan|广日|日本|JP|川日|东京|大阪|泉日|埼玉|沪日|深日|🇯🇵|Japan|广新|新加坡|SG|坡|狮城|🇸🇬|Singapore|广韩|韩国|韓國|KR|首尔|春川|🇰🇷|Korea|广美|US|美国|纽约|波特兰|达拉斯|俄勒|凤凰城|费利蒙|洛杉|圣何塞|圣克拉|西雅|芝加|🇺🇸|United States|英国|UK|United Kingdom|伦敦|英|London|🇬🇧)).)*$"}
+default: &default {type: select, proxies: [默认代理,香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,直连,拒绝] }
+default_no: &default_no {type: select, proxies: [香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,直连,拒绝] }
+default_l: &default_l {type: select, proxies: [直连,默认代理,香港-故转,台湾-故转,日本-故转,韩国-故转,新加坡-故转,美国-故转,英国-故转,德国-故转,其他-故转,香港-手动,香港-自动,台湾-手动,台湾-自动,日本-手动,日本-自动,韩国-手动,韩国-自动,新加坡-手动,新加坡-自动,美国-手动,美国-自动,英国-手动,英国-自动,德国-手动,德国-自动,其他-自动,所有-自动,所有-手动,拒绝] }
+
+proxy-groups:
+  - { name: 直连, type: select, proxies: [LOCAL], url: 'https://223.5.5.5/generate_204', expected-status: 204, interval: 7200, timeout: 3000, lazy: false, hidden: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/DIRECT.webp' }
+  - {name: 默认代理, <<: *default_no, filter: "^((?!(LOCAL|拒绝|直连)).)*$", icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Global.webp'}
+#  - {name: ADS, type: select, proxies: [REJECT-DROP,直连,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Adguard.webp' }
+#  - {name: WEBRTC, type: select, proxies: [REJECT-DROP,直连,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Link.webp' }
+  - {name: GDNS,  type: select ,<<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Server.webp'}
+  - {name: YouTube, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/YouTube.webp'}
+  - {name: Google, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Google.webp'}
+  - {name: AI, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/ChatGPT.webp'}
+  - {name: GitHub, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/GitHub.webp'}
+  - {name: Bing, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Bing.webp'}
+  - {name: OneDrive, <<: *default_l, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/OneDrive.webp'}
+  - {name: Microsoft, <<: *default_l, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Microsoft.webp'}
+  - {name: TikTok, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/TikTok.webp'}
+  - {name: Instagram, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Instagram.webp'}
+  - {name: X, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/X.webp'}
+  - {name: Telegram, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Telegram.webp'}
+  - {name: NETFLIX, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Netflix.webp' }
+  - {name: PayPal, <<: *default, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/PayPal.webp'}
+  - {name: GAME-CN, <<: *default_l, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Steam.webp'}
+  - {name: DIRECT_RULE, <<: *default_l, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/China.webp'}
+  - {name: 国外QUIC, type: select, proxies: [拒绝,默认代理],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
+  - {name: 国外, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Home.webp'}
+  - {name: 漏网之鱼, <<: *default,icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
+  - {name: 所有-自动, <<: *auto, include-all: true, filter: "^((?!(LOCAL|拒绝|直连)).)*$",icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 所有-手动, <<: *select,include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Settings.webp' }
+  - {name: 香港-故转, <<: *fall,proxies: [香港-手动,香港-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 香港-自动,<<: [*auto,*hk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 香港-手动,<<: [*select,*hk]}
+  - {name: 台湾-故转, <<: *fall,proxies: [台湾-手动,台湾-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 台湾-自动,<<: [*auto,*tw],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 台湾-手动, <<: [*select,*tw]}
+  - {name: 日本-故转, <<: *fall,proxies: [日本-手动,日本-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 日本-自动,<<: [*auto,*jp],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 日本-手动, <<: [*select,*jp]}
+  - {name: 韩国-故转, <<: *fall,proxies: [韩国-手动,韩国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 韩国-自动,<<: [*auto,*kr],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 韩国-手动, <<: [*select,*kr]}
+  - {name: 新加坡-故转, <<: *fall,proxies: [新加坡-手动,新加坡-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 新加坡-自动,<<: [*auto,*sg],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 新加坡-手动, <<: [*select,*sg]}
+  - {name: 德国-故转, <<: *fall,proxies: [德国-手动,德国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 德国-自动,<<: [*auto,*de],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 德国-手动, <<: [*select,*de]}
+  - {name: 英国-故转, <<: *fall,proxies: [英国-手动,英国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 英国-自动,<<: [*auto,*uk],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 英国-手动, <<: [*select,*uk]}
+  - {name: 美国-故转, <<: *fall,proxies: [美国-手动,美国-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 美国-自动,<<: [*auto,*us],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 美国-手动, <<: [*select,*us]}
+  - {name: 其他-故转, <<: *fall,proxies: [其他-手动,其他-自动],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Video_Vimeo.webp'}
+  - {name: 其他-自动,<<: [*auto,*other],icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Vimeo.webp'}
+  - {name: 其他-手动, <<: [*select,*other], icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Other.webp'}
+  - {name: GLOBAL, type: select, include-all: true, icon: 'https://cdn.gh-proxy.com/https://raw.githubusercontent.com/canary625/proxy/main/icon/Globefish.webp'}
+  
+  
+  
