@@ -8,7 +8,8 @@ log-level: error
 unified-delay: true
 tcp-concurrent: true
 find-process-mode: off
-global-client-fingerprint: random
+# global-client-fingerprint: random
+client-fingerprint: chrome
 disable-keep-alive: false
 keep-alive-interval: 30
 keep-alive-idle: 600
